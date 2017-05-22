@@ -3,13 +3,13 @@
 }
 
 .App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+  /*animation: App-logo-spin infinite 20s linear;*/
+  height: 50px;
 }
 
 .App-header {
   background-color: #222;
-  height: 150px;
+  height: 60px;
   padding: 20px;
   color: white;
 }
@@ -19,6 +19,35 @@
 }
 
 @keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+a:link {
+  color: white;
+}
+
+
+/* unvisited link */
+
+a:visited {
+  color: purple;
+}
+
+
+/* visited link */
+
+a:hover {
+  color: orange;
+}
+
+
+/* mouse over link */
+
+a:active {
+  color: white;
 }
