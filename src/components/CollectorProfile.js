@@ -6,15 +6,17 @@ class CollectorProfile extends Component {
   constructor(props){
   	super(props);
   	this.state = {};
-    this.props.fetchProfile();
-    console.log('construct');
+    console.log(props.ssr);
+    if ('CollectorProfile' !== props.ssr.path) {
+      this.props.fetchProfile();
+    }
+    this.socialImg = decodeURIComponent(this.props.collector.socialImageUrl);
   }
   componentDidMount() {
     console.log('componentDidMount');
   }
   render(){
     const { collector = {}, isBusy = true, updateBusy = false, updateProfile } = this.props;
-    // let updatedCollector = {...collector}
     return(
       <div>
         {isBusy ?
@@ -24,6 +26,8 @@ class CollectorProfile extends Component {
           :
           <div>
             <h1>{collector.collectorName}</h1>
+            <br />
+            <img src={this.socialImg} alt={collector.collectorName}></img>
             <br />
             <p>({collector.description})</p>
             <br />
@@ -38,10 +42,12 @@ class CollectorProfile extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
+  console.log(state);
   return {
     collector: state.profile.collector,
-    isBusy: state.profile.isBusy,
-    updateBusy: state.profile.updateBusy
+    updateBusy: state.profile.updateBusy,
+    ssr: state.ssr,
+    isBusy: ('CollectorProfile' !== state.ssr.path) ? state.profile.isBusy : ('CollectorProfile' !== state.ssr.path)
   }
 }
 

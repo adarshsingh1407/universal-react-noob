@@ -18,6 +18,7 @@ export const requestProfile = (id) => {
 }
 
 export const receiveProfile = (id, collector = {}) => {
+  console.log(collector);
   return {
     type: RECEIVED_PROFILE,
     id,

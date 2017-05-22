@@ -10,7 +10,8 @@ const { createStore, applyMiddleware } = require('redux')
 const {default: App} = require('../src/App')
 const appReducers = require('../src/reducers').default;
 const { fetchProfile } = require('../src/actions/ProfileActions');
-const serialize = require('serialize-javascript');
+import { setSSR } from '../src/actions/SSRActions';
+import serialize from 'serialize-javascript';
 const APP_TITLE = 'Dauble | Collector';
 
 module.exports = function universalLoader(req, res) {
@@ -34,42 +35,52 @@ module.exports = function universalLoader(req, res) {
     let preloadedState = {};
 
     let unsubscribe = store.subscribe(() => {
+
       preloadedState = store.getState();
+      console.log(preloadedState);
+
+      if (preloadedState.ssr.isDone) {
+        //SSR Done!!
+        unsubscribe();
+        preloadedState = serialize(preloadedState, {isJSON: true});
+        console.log(preloadedState);
+
+        const markup = renderToString(
+          <Provider store={store}>
+            <StaticRouter
+              location={req.url}
+              context={context}
+            >
+              <App />
+            </StaticRouter>
+          </Provider>
+        )
+
+        const SSR_TITLE = renderToString(
+          <title>{APP_TITLE}</title>
+        )
+        if (context.url) {
+          // Somewhere a `<Redirect>` was rendered
+          redirect(301, context.url)
+        } else {
+          console.log({msg:'req.path', data:req.path});
+          console.log({msg:'req.query', data:req.query});
+          // we're good, send the response
+          const RenderedApp = htmlData
+            .replace('{{SSR}}', markup)
+            .replace('<title>DCW</title>', SSR_TITLE)
+            .replace('{{__SERVER_DATA__}}', preloadedState);
+          res.send(RenderedApp)
+        }
+      } else if (!preloadedState.profile.isBusy) {
+        console.log('profile fetched');
+        console.log(preloadedState);
+        // Trigger SSR only after profile has been fetched
+        store.dispatch(setSSR('CollectorProfile', true));
+      }
     })
 
     store.dispatch(fetchProfile(39));
-
-    setTimeout(function () {
-      unsubscribe();
-
-      const markup = renderToString(
-        <Provider store={store}>
-          <StaticRouter
-            location={req.url}
-            context={context}
-          >
-            <App />
-          </StaticRouter>
-        </Provider>
-      )
-
-      const SSR_TITLE = renderToString(
-        <title>{APP_TITLE}</title>
-      )
-      if (context.url) {
-        // Somewhere a `<Redirect>` was rendered
-        redirect(301, context.url)
-      } else {
-        console.log({msg:'req.path', data:req.path});
-        console.log({msg:'req.query', data:req.query});
-        // we're good, send the response
-        const RenderedApp = htmlData
-          .replace('{{SSR}}', markup)
-          .replace('<title>DCW</title>', SSR_TITLE)
-        res.send(RenderedApp)
-      }
-
-    }, 4000);
 
   })
 }

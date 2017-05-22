@@ -7,18 +7,28 @@ import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger'
 import {Provider} from 'react-redux';
 import appReducers from './reducers';
-// import { addSubstance } from './actions/SubstanceActions';
-// import { fetchProfile } from './actions/ProfileActions';
+import { receiveProfile } from './actions/ProfileActions';
+import { setSSR } from './actions/SSRActions';
 import { BrowserRouter } from 'react-router-dom'
 
 const loggerMiddleware = createLogger();
 
+const preloadedState = window.__SERVER_DATA__;
+delete window.__SERVER_DATA__;
+
+const middlewares = [thunk, loggerMiddleware];
+
 let store = createStore(
   appReducers,
-  applyMiddleware(
-    thunk,
-    loggerMiddleware)
+  applyMiddleware(...middlewares)
 );
+
+let collector = {
+  data: preloadedState.profile.collector
+}
+
+store.dispatch(receiveProfile(preloadedState.profile.collector.collectorId, collector));
+store.dispatch(setSSR(preloadedState.ssr.path, preloadedState.ssr.isDone));
 
 let unsubscribe = store.subscribe(() => {
 })
