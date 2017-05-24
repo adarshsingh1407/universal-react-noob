@@ -9,12 +9,18 @@ import {Provider} from 'react-redux';
 import appReducers from './reducers';
 import { receiveProfile } from './actions/ProfileActions';
 import { setSSR } from './actions/SSRActions';
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 const loggerMiddleware = createLogger();
 
 const preloadedState = window.__SERVER_DATA__;
 delete window.__SERVER_DATA__;
+
+const cookies = new Cookies();
+
+cookies.set('myCat', 'Pacman', { path: '/' });
+console.log(cookies.get('myCat')); // Pacman
 
 const middlewares = [thunk, loggerMiddleware];
 

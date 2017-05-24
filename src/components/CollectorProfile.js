@@ -6,14 +6,22 @@ class CollectorProfile extends Component {
   constructor(props){
   	super(props);
   	this.state = {};
-    console.log(props.ssr);
-    if ('CollectorProfile' !== props.ssr.path) {
-      this.props.fetchProfile();
+    this.onServer = false;
+    if (props.staticContext !== undefined && props.staticContext.onServer !== undefined) {
+      this.onServer = props.staticContext.onServer;
     }
     this.socialImg = decodeURIComponent(this.props.collector.socialImageUrl);
+    if (this.onServer) {
+      this.collectorImage = <img src={this.socialImg} alt="Adarsh"></img>;
+    } else {
+      this.collectorImage = <img src={this.socialImg} alt="Singh"></img>;
+    }
+    console.log('onServer : ' + this.onServer);
   }
   componentDidMount() {
-    console.log('componentDidMount');
+    if (this.props.componentPath !== this.props.ssrPath) {
+      this.props.fetchProfile();
+    }
   }
   render(){
     const { collector = {}, isBusy = true, updateBusy = false, updateProfile } = this.props;
@@ -27,7 +35,7 @@ class CollectorProfile extends Component {
           <div>
             <h1>{collector.collectorName}</h1>
             <br />
-            <img src={this.socialImg} alt={collector.collectorName}></img>
+            {this.collectorImage}
             <br />
             <p>({collector.description})</p>
             <br />
@@ -42,12 +50,14 @@ class CollectorProfile extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  console.log(state);
+  const ssrPath = decodeURIComponent(state.ssr.path);
+  const componentPath = '/collector/' + ownProps.match.params.actorId;
   return {
     collector: state.profile.collector,
     updateBusy: state.profile.updateBusy,
-    ssr: state.ssr,
-    isBusy: ('CollectorProfile' !== state.ssr.path) ? state.profile.isBusy : ('CollectorProfile' !== state.ssr.path)
+    ssrPath: ssrPath,
+    componentPath: componentPath,
+    isBusy: (componentPath !== ssrPath) ? state.profile.isBusy : (componentPath !== ssrPath)
   }
 }
 

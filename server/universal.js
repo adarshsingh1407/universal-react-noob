@@ -1,17 +1,19 @@
-const path = require('path')
-const fs = require('fs')
-const React = require('react')
-const {Provider} = require('react-redux')
-const {renderToString} = require('react-dom/server')
-const {StaticRouter} = require('react-router-dom')
-const {createLogger} = require('redux-logger')
-const thunk = require('redux-thunk').default
-const { createStore, applyMiddleware } = require('redux')
-const {default: App} = require('../src/App')
-const appReducers = require('../src/reducers').default;
-const { fetchProfile } = require('../src/actions/ProfileActions');
+import path from 'path';
+import fs from 'fs';
+import React from 'react';
+import {Provider} from 'react-redux';
+import {renderToString} from 'react-dom/server';
+import {StaticRouter} from 'react-router-dom';
+import {createLogger} from 'redux-logger';
+import { default as thunk } from 'redux-thunk';
+import { createStore, applyMiddleware } from 'redux';
+import {default as App} from '../src/App';
+import {default as appReducers} from '../src/reducers';
+import { fetchProfile } from '../src/actions/ProfileActions';
 import { setSSR } from '../src/actions/SSRActions';
 import serialize from 'serialize-javascript';
+import Cookies from 'universal-cookie';
+
 const APP_TITLE = 'Dauble | Collector';
 
 module.exports = function universalLoader(req, res) {
@@ -22,7 +24,11 @@ module.exports = function universalLoader(req, res) {
       console.error('read err', err)
       return res.status(404).end()
     }
-    const context = {}
+    const context = {
+      onServer: true
+    }
+    const cookies = new Cookies(req.headers.cookie);
+    console.log(cookies.get('myCat'));
     const loggerMiddleware = createLogger()
     const store = createStore(
       appReducers,
@@ -37,13 +43,11 @@ module.exports = function universalLoader(req, res) {
     let unsubscribe = store.subscribe(() => {
 
       preloadedState = store.getState();
-      console.log(preloadedState);
 
       if (preloadedState.ssr.isDone) {
         //SSR Done!!
         unsubscribe();
         preloadedState = serialize(preloadedState, {isJSON: true});
-        console.log(preloadedState);
 
         const markup = renderToString(
           <Provider store={store}>
@@ -63,8 +67,8 @@ module.exports = function universalLoader(req, res) {
           // Somewhere a `<Redirect>` was rendered
           redirect(301, context.url)
         } else {
-          console.log({msg:'req.path', data:req.path});
-          console.log({msg:'req.query', data:req.query});
+          // console.log({msg:'req.path', data:req.path});
+          // console.log({msg:'req.query', data:req.query});
           // we're good, send the response
           const RenderedApp = htmlData
             .replace('{{SSR}}', markup)
@@ -73,14 +77,14 @@ module.exports = function universalLoader(req, res) {
           res.send(RenderedApp)
         }
       } else if (!preloadedState.profile.isBusy) {
-        console.log('profile fetched');
-        console.log(preloadedState);
         // Trigger SSR only after profile has been fetched
-        store.dispatch(setSSR('CollectorProfile', true));
+        store.dispatch(setSSR(req.path, true));
       }
     })
 
-    store.dispatch(fetchProfile(39));
+    const actorId = parseInt(req.path.replace('/collector/', ''), 10);
+
+    store.dispatch(fetchProfile(actorId));
 
   })
 }

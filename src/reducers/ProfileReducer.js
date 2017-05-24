@@ -25,6 +25,13 @@ function profileReducer (state = {}, action) {
         receivedAt: action.receivedAt,
         collector: action.collector
       };
+    case RECEIVED_PROFILE:
+      return {
+        ...state,
+        isBusy: false,
+        updateBusy: false,
+        receivedAt: action.receivedAt
+      };
     case UPDATE_PROFILE:
       return {
         ...state,

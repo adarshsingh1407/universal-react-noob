@@ -6,6 +6,7 @@ export const REQUEST_PROFILE = 'REQUEST_PROFILE';
 export const RECEIVED_PROFILE = 'RECEIVED_PROFILE';
 export const UPDATE_PROFILE = 'UPDATE_PROFILE';
 export const PROFILE_UPDATED = 'PROFILE_UPDATED';
+export const FETCH_PROFILE_FAILED = 'FETCH_PROFILE_FAILED';
 
 /*
  * Action Creators
@@ -18,11 +19,18 @@ export const requestProfile = (id) => {
 }
 
 export const receiveProfile = (id, collector = {}) => {
-  console.log(collector);
   return {
     type: RECEIVED_PROFILE,
     id,
     collector: (collector.data !== undefined) ? collector.data : {},
+    receivedAt: Date.now()
+  }
+}
+
+export const fetchProfileFailed = (id) => {
+  return {
+    type: FETCH_PROFILE_FAILED,
+    id,
     receivedAt: Date.now()
   }
 }
@@ -43,16 +51,32 @@ export const profileUpdatedAction = (collector = {}) => {
 
 export const fetchProfile = (id) => {
   return function(dispatch) {
-    dispatch(requestProfile(id));
-    return fetch(`https://stagdcaapi.dauble.com/myDaubleProfile?actorId=${id}`)
-      .then(result => {
-        return result.json();
-      }, err => {
-        console.error();
-      })
-      .then(collector => {
-        dispatch(receiveProfile(id, collector))
-      })
+    if (!isNaN(id)) {
+      dispatch(requestProfile(id));
+      return fetch(`https://stagdcaapi.dauble.com/myDaubleProfile?actorId=${id}`)
+        .then(result => {
+          if (result.status === 200) {
+            return result.json();
+          } else {
+            return {
+              success: false,
+              message: 'No such collector exists'
+            }
+          }
+        }, err => {
+          console.error();
+        })
+        .then(response => {
+          if (response.success) {
+            dispatch(receiveProfile(id, response));
+          } else {
+            dispatch(fetchProfileFailed(id));
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+    }
   }
 }
 
@@ -76,11 +100,10 @@ export const updateProfile = () => {
         })
     })
     .then(result => {
-      return result.json();
-    }, err => console.log(err))
-    .then(collector => {
-      console.log(collector);
-      dispatch(profileUpdatedAction(collector))
+      dispatch(profileUpdatedAction(result.json()))
+    }, err => console.error(err))
+    .catch((error) => {
+      console.error(error);
     })
   }
 }
