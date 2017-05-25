@@ -10,17 +10,18 @@ class CollectorProfile extends Component {
     if (props.staticContext !== undefined && props.staticContext.onServer !== undefined) {
       this.onServer = props.staticContext.onServer;
     }
-    this.socialImg = decodeURIComponent(this.props.collector.socialImageUrl);
-    if (this.onServer) {
-      this.collectorImage = <img src={this.socialImg} alt="Adarsh"></img>;
-    } else {
-      this.collectorImage = <img src={this.socialImg} alt="Singh"></img>;
-    }
-    console.log('onServer : ' + this.onServer);
+    // console.log('onServer : ' + this.onServer);
   }
   componentDidMount() {
     if (this.props.componentPath !== this.props.ssrPath) {
-      this.props.fetchProfile();
+      var actorId = parseInt(this.props.match.params.actorId, 10);
+      this.props.fetchProfile(actorId);
+    }
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.match.params.actorId !== this.props.match.params.actorId) {
+      var actorId = parseInt(this.props.match.params.actorId, 10);
+      this.props.fetchProfile(actorId);
     }
   }
   render(){
@@ -35,7 +36,7 @@ class CollectorProfile extends Component {
           <div>
             <h1>{collector.collectorName}</h1>
             <br />
-            {this.collectorImage}
+            {/* {this.collectorImage} */}
             <br />
             <p>({collector.description})</p>
             <br />
@@ -62,8 +63,8 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  fetchProfile: () => {
-    return dispatch(fetchProfile(parseInt(ownProps.match.params.actorId, 10)))
+  fetchProfile: (id) => {
+    return dispatch(fetchProfile(id));
   },
   updateProfile: () => {
     return dispatch(updateProfile());

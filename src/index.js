@@ -29,12 +29,14 @@ let store = createStore(
   applyMiddleware(...middlewares)
 );
 
-let collector = {
-  data: preloadedState.profile.collector
-}
+if (preloadedState.profile !== undefined) {
+  let collector = {
+    data: preloadedState.profile.collector
+  }
 
-store.dispatch(receiveProfile(preloadedState.profile.collector.collectorId, collector));
-store.dispatch(setSSR(preloadedState.ssr.path, preloadedState.ssr.isDone));
+  store.dispatch(receiveProfile(preloadedState.profile.collector.collectorId, collector));
+  store.dispatch(setSSR(preloadedState.ssr.path, preloadedState.ssr.isDone));
+}
 
 let unsubscribe = store.subscribe(() => {
 })

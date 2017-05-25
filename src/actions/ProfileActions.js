@@ -49,7 +49,7 @@ export const profileUpdatedAction = (collector = {}) => {
   }
 }
 
-export const fetchProfile = (id) => {
+export const fetchProfile = (id, x) => {
   return function(dispatch) {
     if (!isNaN(id)) {
       dispatch(requestProfile(id));

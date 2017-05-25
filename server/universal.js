@@ -27,8 +27,8 @@ module.exports = function universalLoader(req, res) {
     const context = {
       onServer: true
     }
-    const cookies = new Cookies(req.headers.cookie);
-    console.log(cookies.get('myCat'));
+    // const cookies = new Cookies(req.headers.cookie);
+    // console.log(cookies.get('myCat'));
     const loggerMiddleware = createLogger()
     const store = createStore(
       appReducers,
@@ -84,7 +84,29 @@ module.exports = function universalLoader(req, res) {
 
     const actorId = parseInt(req.path.replace('/collector/', ''), 10);
 
-    store.dispatch(fetchProfile(actorId));
+    if (!isNaN(actorId) && actorId > 0) {
+      store.dispatch(fetchProfile(actorId));
+    } else {
+      const markup = renderToString(
+        <Provider store={store}>
+          <StaticRouter
+            location={req.url}
+            context={context}
+          >
+            <App />
+          </StaticRouter>
+        </Provider>
+      )
+
+      const SSR_TITLE = renderToString(
+        <title>{APP_TITLE}</title>
+      )
+      const RenderedApp = htmlData
+        .replace('{{SSR}}', markup)
+        .replace('<title>DCW</title>', SSR_TITLE)
+        .replace('{{__SERVER_DATA__}}', preloadedState = serialize({}, {isJSON: true}));
+      res.send(RenderedApp)
+    }
 
   })
 }
