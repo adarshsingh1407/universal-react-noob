@@ -67,8 +67,6 @@ module.exports = function universalLoader(req, res) {
           // Somewhere a `<Redirect>` was rendered
           redirect(301, context.url)
         } else {
-          // console.log({msg:'req.path', data:req.path});
-          // console.log({msg:'req.query', data:req.query});
           // we're good, send the response
           const RenderedApp = htmlData
             .replace('{{SSR}}', markup)
