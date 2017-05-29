@@ -25,7 +25,7 @@ module.exports = function universalLoader(req, res) {
       return res.status(404).end()
     }
     const context = {
-      onServer: true
+      isServer: true
     }
     // const cookies = new Cookies(req.headers.cookie);
     // console.log(cookies.get('myCat'));

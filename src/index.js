@@ -17,10 +17,10 @@ const loggerMiddleware = createLogger();
 const preloadedState = window.__SERVER_DATA__;
 delete window.__SERVER_DATA__;
 
-const cookies = new Cookies();
-
-cookies.set('myCat', 'Pacman', { path: '/' });
-console.log(cookies.get('myCat')); // Pacman
+// const cookies = new Cookies();
+//
+// cookies.set('myCat', 'Pacman', { path: '/' });
+// console.log(cookies.get('myCat')); // Pacman
 
 const middlewares = [thunk, loggerMiddleware];
 

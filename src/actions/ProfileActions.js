@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch';
+import { profileService } from '../services/ProfileService';
 /*
  * Actions
  */
@@ -49,61 +50,48 @@ export const profileUpdatedAction = (collector = {}) => {
   }
 }
 
-export const fetchProfile = (id, x) => {
+export const fetchProfile = (id) => {
   return function(dispatch) {
     if (!isNaN(id)) {
       dispatch(requestProfile(id));
-      return fetch(`https://stagdcaapi.dauble.com/myDaubleProfile?actorId=${id}`)
-        .then(result => {
-          if (result.status === 200) {
-            return result.json();
-          } else {
-            return {
-              success: false,
-              message: 'No such collector exists'
-            }
-          }
-        }, err => {
-          console.error();
-        })
-        .then(response => {
-          if (response.success) {
-            dispatch(receiveProfile(id, response));
-          } else {
-            dispatch(fetchProfileFailed(id));
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        })
+      profileService.fetchProfile(id).then((response) => {
+        dispatch(receiveProfile(id, response.data))
+      }, (err) => {
+        dispatch(fetchProfileFailed(id));
+        console.log(err);
+      }).catch(function (error) {
+          dispatch(fetchProfileFailed(id));
+          console.log(error);
+      });
     }
   }
 }
 
 export const updateProfile = () => {
-  return function(dispatch) {
-    dispatch(updateProfileAction());
-    return fetch(`https://stagdcaapi.dauble.com/myProfile`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'accessToken' : 'Q3KDBYBUCLJKQIV0BGKBOWJRLNCDR5NJ'
-      },
-      body: JSON.stringify({
-        collectorEmail: 'adarshsingh1407@gmail.com',
-        collectorName: 'Adarsh Singh',
-        dateOfBirth: 711052200000,
-        description: 'Cinephile, Music-freak',
-        gender: 'M',
-        username: 'adarsh1407',
-        webSite: 'fb.com'
-        })
-    })
-    .then(result => {
-      dispatch(profileUpdatedAction(result.json()))
-    }, err => console.error(err))
-    .catch((error) => {
-      console.error(error);
-    })
-  }
+  console.log('reimplement this using axios');
+  // return function(dispatch) {
+  //   dispatch(updateProfileAction());
+  //   return fetch(`https://stagdcaapi.dauble.com/myProfile`, {
+  //     method: 'PUT',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'accessToken' : 'Q3KDBYBUCLJKQIV0BGKBOWJRLNCDR5NJ'
+  //     },
+  //     body: JSON.stringify({
+  //       collectorEmail: 'adarshsingh1407@gmail.com',
+  //       collectorName: 'Adarsh Singh',
+  //       dateOfBirth: 711052200000,
+  //       description: 'Cinephile, Music-freak',
+  //       gender: 'M',
+  //       username: 'adarsh1407',
+  //       webSite: 'fb.com'
+  //       })
+  //   })
+  //   .then(result => {
+  //     dispatch(profileUpdatedAction(result.json()))
+  //   }, err => console.error(err))
+  //   .catch((error) => {
+  //     console.error(error);
+  //   })
+  // }
 }

@@ -6,11 +6,11 @@ class CollectorProfile extends Component {
   constructor(props){
   	super(props);
   	this.state = {};
-    this.onServer = false;
-    if (props.staticContext !== undefined && props.staticContext.onServer !== undefined) {
-      this.onServer = props.staticContext.onServer;
+    this.isServer = false;
+    if (props.staticContext !== undefined && props.staticContext.isServer !== undefined) {
+      this.isServer = props.staticContext.isServer;
     }
-    // console.log('onServer : ' + this.onServer);
+    // console.log('isServer : ' + this.isServer);
   }
   componentDidMount() {
     if (this.props.componentPath !== this.props.ssrPath) {
