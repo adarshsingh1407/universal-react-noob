@@ -4,9 +4,9 @@ const compression = require('compression')
 const express = require('express')
 const morgan = require('morgan')
 const path = require('path')
-const fs = require('fs')
+// const fs = require('fs')
 
-require('babel-register')({ ignore: /\/(build|node_modules)\//, presets: ['react-app'] })
+require('babel-register')({ ignore: /\/(build|node_modules)\//, presets: ['es2015', 'react-app', 'stage-0'] })
 
 // routes
 const index = require('./routes/index')
