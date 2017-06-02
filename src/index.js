@@ -10,7 +10,7 @@ import appReducers from './reducers';
 import { receiveProfile } from './actions/ProfileActions';
 import { setSSR } from './actions/SSRActions';
 import { BrowserRouter } from 'react-router-dom';
-import Cookies from 'universal-cookie';
+// import Cookies from 'universal-cookie';
 
 const loggerMiddleware = createLogger();
 
@@ -29,7 +29,7 @@ let store = createStore(
   applyMiddleware(...middlewares)
 );
 
-if (preloadedState.profile !== undefined) {
+if (preloadedState && preloadedState.profile) {
   let collector = {
     data: preloadedState.profile.collector
   }

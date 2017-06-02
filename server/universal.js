@@ -4,7 +4,7 @@ import React from 'react';
 import {Provider} from 'react-redux';
 import {renderToString} from 'react-dom/server';
 import {StaticRouter} from 'react-router-dom';
-import {createLogger} from 'redux-logger';
+// import {createLogger} from 'redux-logger';
 import { default as thunk } from 'redux-thunk';
 import { createStore, applyMiddleware } from 'redux';
 import {default as App} from '../src/App';
@@ -12,7 +12,7 @@ import {default as appReducers} from '../src/reducers';
 import { fetchProfile } from '../src/actions/ProfileActions';
 import { setSSR } from '../src/actions/SSRActions';
 import serialize from 'serialize-javascript';
-import Cookies from 'universal-cookie';
+// import Cookies from 'universal-cookie';
 
 const APP_TITLE = 'Dauble | Collector';
 
@@ -29,7 +29,7 @@ module.exports = function universalLoader(req, res) {
     }
     // const cookies = new Cookies(req.headers.cookie);
     // console.log(cookies.get('myCat'));
-    const loggerMiddleware = createLogger()
+    // const loggerMiddleware = createLogger()
     const store = createStore(
       appReducers,
       applyMiddleware(
@@ -65,15 +65,13 @@ module.exports = function universalLoader(req, res) {
         )
         if (context.url) {
           // Somewhere a `<Redirect>` was rendered
-          redirect(301, context.url)
+          // redirect(301, context.url)
         } else {
-          // console.log({msg:'req.path', data:req.path});
-          // console.log({msg:'req.query', data:req.query});
           // we're good, send the response
           const RenderedApp = htmlData
             .replace('{{SSR}}', markup)
             .replace('<title>DCW</title>', SSR_TITLE)
-            .replace('{{__SERVER_DATA__}}', preloadedState);
+            .replace('{SERVER_DATA:""}', preloadedState);
           res.send(RenderedApp)
         }
       } else if (!preloadedState.profile.isBusy) {
@@ -104,7 +102,7 @@ module.exports = function universalLoader(req, res) {
       const RenderedApp = htmlData
         .replace('{{SSR}}', markup)
         .replace('<title>DCW</title>', SSR_TITLE)
-        .replace('{{__SERVER_DATA__}}', preloadedState = serialize({}, {isJSON: true}));
+        .replace('{SERVER_DATA:""}', preloadedState = serialize({}, {isJSON: true}));
       res.send(RenderedApp)
     }
 
