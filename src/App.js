@@ -9,6 +9,7 @@ class App extends Component {
     constructor(props) {
         super(props);
         console.info('DCW INIT');
+        console.log(process.env.NODE_ENV);//available on server as well as browser
     }
     componentDidMount = () => {
         // API calls here

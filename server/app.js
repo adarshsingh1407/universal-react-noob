@@ -36,4 +36,6 @@ app.use('/api', api)
 // Always return the main index.html, so react-router render the route in the client
 app.use('/', universalLoader)
 
+console.log('NODE_ENV : ' + process.env.NODE_ENV);
+
 module.exports = app

@@ -1,4 +1,4 @@
-process.env.NODE_ENV = 'production';
+process.env.NODE_ENV = 'development';
 process.env.PORT = 3000;
 
 // Load environment variables from .env file. Suppress warnings using silent
@@ -12,7 +12,7 @@ var fs = require('fs-extra');
 var path = require('path');
 var url = require('url');
 var webpack = require('webpack');
-var config = require('../config/webpack.config.prod');
+var config = require('../config/webpack.config.devbuild');
 var paths = require('../config/paths');
 var checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 var FileSizeReporter = require('react-dev-utils/FileSizeReporter');
@@ -52,7 +52,7 @@ function printErrors(summary, errors) {
 
 // Create the production build and print the deployment instructions.
 function build(previousFileSizes) {
-  console.log('Creating an optimized production build...');
+  console.log('Creating an optimized development build...');
   webpack(config).run((err, stats) => {
     if (err) {
       printErrors('Failed to compile.', [err]);
